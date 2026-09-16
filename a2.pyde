@@ -10,7 +10,21 @@ def setup():
 def toggle(x, y):
 
 def draw():
-
+    background(0)
+        i = 0
+        while i < grid_size:
+            j = 0
+            while j < grid_size:
+                if grid[i][j] == 1:
+                    fill(255) 
+                else:
+                    fill(40)
+                stroke(80)
+                strokeWeight(2)
+                rect(j * cell_size, i * cell_size, cell_size, cell_size)
+                j += 1
+            i += 1
+def check_win():
 
 def mousePressed():
     y = mouseX // cell_size
