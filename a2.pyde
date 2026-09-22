@@ -1,14 +1,14 @@
-
 import random
 grid_size = 3
 cell_size = 100
 
-
 grid = [
     [1, 0, 1],
     [0, 0, 0],
-    [1, 0, 1,]
+    [1, 0, 1]
 ]
+
+game_over = False
 
 def setup():
     size(300, 300)
@@ -35,44 +35,35 @@ def draw():
             j += 1
         i += 1
 
-def mousePressed():
-    y = mouseX // cell_size
-    x = mouseY // cell_size
+    if game_over:
+        fill(0, 0, 0, 210)
+        rect(0, 0, width, height)
+        fill(34, 197, 94)
+        textSize(32)
+        textAlign(CENTER, CENTER)
+        text("YOU WIN!", width / 2, height / 2)
 
-    if 0 <= x < cell_size and 0 <= y < cell_size:
-        toggle(x, y)
-=======
-import random
-grid_size = 5
-cell_size = 100
-
-grid = []
-
-def setup():
-    size(500, 500)
-
-def toggle(x, y):
-
-def draw():
-    background(0)
-        i = 0
-        while i < grid_size:
-            j = 0
-            while j < grid_size:
-                if grid[i][j] == 1:
-                    fill(255) 
-                else:
-                    fill(40)
-                stroke(80)
-                strokeWeight(2)
-                rect(j * cell_size, i * cell_size, cell_size, cell_size)
-                j += 1
-            i += 1
 def check_win():
+    i = 0
+    while i < grid_size:
+        j = 0
+        while j < grid_size:
+            if grid[i][j] == 1:
+                return False
+            j += 1
+        i += 1
+    return True
 
 def mousePressed():
+    global game_over
+
+    if game_over:
+        return
+
     y = mouseX // cell_size
     x = mouseY // cell_size
 
-    if 0 <= x < cell_size and 0 <= y < cell_size:
+    if 0 <= x < grid_size and 0 <= y < grid_size:
         toggle(x, y)
+        if check_win():
+            game_over = True
