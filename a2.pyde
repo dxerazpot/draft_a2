@@ -1,17 +1,39 @@
 import random
-grid_size = 3
-cell_size = 100
 
-grid = [
-    [1, 0, 1],
-    [0, 0, 0],
-    [1, 0, 1]
-]
-
+grid_size = 5
+cell_size = 80
 game_over = False
 
+def create_grid():
+    g = []
+    i = 0
+    while i < grid_size:
+        row = []
+        j = 0
+        while j < grid_size:
+            row.append(0)
+            j += 1
+        g.append(row)
+        i += 1
+    return g
+
+grid = create_grid()
+
 def setup():
-    size(300, 300)
+    size(grid_size * cell_size, grid_size * cell_size)
+    reset_game()
+
+def reset_game():
+    global grid, game_over
+    grid = create_grid()
+    game_over = False
+
+    k = 0
+    while k < 10:
+        rx = random.randint(0, grid_size - 1)
+        ry = random.randint(0, grid_size - 1)
+        toggle(rx, ry)
+        k += 1
 
 def toggle(x, y):
     targets = [(x, y), (x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
@@ -22,8 +44,20 @@ def toggle(x, y):
             grid[tx][ty] = 1 - grid[tx][ty]
         i += 1
 
+def check_win():
+    i = 0
+    while i < grid_size:
+        j = 0
+        while j < grid_size:
+            if grid[i][j] == 1:
+                return False
+            j += 1
+        i += 1
+    return True
+
 def draw():
     background(0)
+
     i = 0
     while i < grid_size:
         j = 0
@@ -43,17 +77,6 @@ def draw():
         textAlign(CENTER, CENTER)
         text("YOU WIN!", width / 2, height / 2)
 
-def check_win():
-    i = 0
-    while i < grid_size:
-        j = 0
-        while j < grid_size:
-            if grid[i][j] == 1:
-                return False
-            j += 1
-        i += 1
-    return True
-
 def mousePressed():
     global game_over
 
@@ -67,3 +90,7 @@ def mousePressed():
         toggle(x, y)
         if check_win():
             game_over = True
+
+def keyPressed():
+    if key == 'r' or key == 'R':
+        reset_game()
