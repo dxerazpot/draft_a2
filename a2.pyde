@@ -1,6 +1,6 @@
 import random
 
-grid_size = 3
+grid_size = 5
 cell_size = 80
 moves = 0
 game_over = False
