@@ -1,6 +1,6 @@
 import random
 
-grid_size = 3
+grid_size = 5
 cell_size = 80
 moves = 0
 game_over = False
@@ -116,8 +116,6 @@ def load_game():
         print("No save.txt file found or format error.")
 
 def draw():
-    background(0)
-
     i = 0
     while i < grid_size:
         j = 0
@@ -128,6 +126,10 @@ def draw():
             rect(j * cell_size, i * cell_size, cell_size, cell_size)
             j += 1
         i += 1
+
+    fill(30)
+    noStroke()
+    rect(0, grid_size * cell_size, width, 60)
 
     fill(200)
     textSize(14)
