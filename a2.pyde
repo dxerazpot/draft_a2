@@ -132,9 +132,9 @@ def draw():
         while j < grid_size:
             is_hover = False
             if hover_active:
-                if i == hover_row:
-                    if j == hover_col:
-                        is_hover = True
+                dist = abs(i - hover_row) + abs(j - hover_col)
+                if dist <= 1:
+                    is_hover = True
 
             if grid[i][j] == 1:
                 if is_hover:
