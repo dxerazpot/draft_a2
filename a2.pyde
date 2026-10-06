@@ -43,8 +43,9 @@ def toggle(x, y):
     i = 0
     while i < len(targets):
         tx, ty = targets[i]
-        if 0 <= tx < grid_size and 0 <= ty < grid_size:
-            grid[tx][ty] = 1 - grid[tx][ty]
+        if 0 <= tx < grid_size:
+            if 0 <= ty < grid_size:
+                grid[tx][ty] = 1 - grid[tx][ty]
         i += 1
 
 def check_win():
@@ -116,11 +117,36 @@ def load_game():
         print("No save.txt file found or format error.")
 
 def draw():
+    hover_col = mouseX // cell_size
+    hover_row = mouseY // cell_size
+
+    hover_active = False
+    if not game_over:
+        if 0 <= hover_row < grid_size:
+            if 0 <= hover_col < grid_size:
+                hover_active = True
+
     i = 0
     while i < grid_size:
         j = 0
         while j < grid_size:
-            fill(255) if grid[i][j] == 1 else fill(40)
+            is_hover = False
+            if hover_active:
+                if i == hover_row:
+                    if j == hover_col:
+                        is_hover = True
+
+            if grid[i][j] == 1:
+                if is_hover:
+                    fill(170)
+                else:
+                    fill(255)
+            else:
+                if is_hover:
+                    fill(15)
+                else:
+                    fill(40)
+
             stroke(80)
             strokeWeight(2)
             rect(j * cell_size, i * cell_size, cell_size, cell_size)
@@ -157,11 +183,12 @@ def mousePressed():
     y = mouseX // cell_size
     x = mouseY // cell_size
 
-    if 0 <= x < grid_size and 0 <= y < grid_size:
-        toggle(x, y)
-        moves += 1
-        if check_win():
-            game_over = True
+    if 0 <= x < grid_size:
+        if 0 <= y < grid_size:
+            toggle(x, y)
+            moves += 1
+            if check_win():
+                game_over = True
 
 def keyPressed():
     if key == 's' or key == 'S':
