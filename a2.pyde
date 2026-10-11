@@ -43,8 +43,7 @@ def toggle(x, y):
     i = 0
     while i < len(targets):
         tx, ty = targets[i]
-        if 0 <= tx < grid_size:
-            if 0 <= ty < grid_size:
+        if 0 <= tx < grid_size and 0 <= ty < grid_size:
                 grid[tx][ty] = 1 - grid[tx][ty]
         i += 1
 
