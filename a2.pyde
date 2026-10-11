@@ -6,17 +6,7 @@ moves = 0
 game_over = False
 
 def create_grid():
-    g = []
-    i = 0
-    while i < grid_size:
-        row = []
-        j = 0
-        while j < grid_size:
-            row.append(0)
-            j += 1
-        g.append(row)
-        i += 1
-    return g
+    return [[0] * grid_size for _ in range(grid_size)]
 
 grid = create_grid()
 
@@ -30,33 +20,20 @@ def reset_game():
     moves = 0
     game_over = False
 
-    k = 0
-    while k < 10:
+    for _ in range(10):
         rx = random.randint(0, grid_size - 1)
         ry = random.randint(0, grid_size - 1)
         toggle(rx, ry)
-        k += 1
     moves = 0
 
 def toggle(x, y):
     targets = [(x, y), (x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-    i = 0
-    while i < len(targets):
-        tx, ty = targets[i]
+    for tx, ty in targets:
         if 0 <= tx < grid_size and 0 <= ty < grid_size:
-                grid[tx][ty] = 1 - grid[tx][ty]
-        i += 1
+            grid[tx][ty] = 1 - grid[tx][ty]
 
 def check_win():
-    i = 0
-    while i < grid_size:
-        j = 0
-        while j < grid_size:
-            if grid[i][j] == 1:
-                return False
-            j += 1
-        i += 1
-    return True
+    return all(cell == 0 for row in grid for cell in row)
 
 def save_game():
     with open("save.txt", "w") as f:
@@ -65,52 +42,23 @@ def save_game():
         f.write("check_win=\n")
         f.write(("1" if game_over else "0") + "\n")
         f.write("grid=\n")
-        
-        i = 0
-        while i < grid_size:
-            row_str = ""
-            j = 0
-            while j < grid_size:
-                row_str += str(grid[i][j])
-                if j < grid_size - 1:
-                    row_str += " "
-                j += 1
-            f.write(row_str + "\n")
-            i += 1
+        for row in grid:
+            f.write(" ".join(map(str, row)) + "\n")
     print("Game Saved to save.txt!")
 
 def load_game():
     global grid, moves, game_over
     try:
         with open("save.txt", "r") as f:
-            lines = f.read().splitlines()
+            lines = [line.strip() for line in f if line.strip()]
 
-        i = 0
-        while i < len(lines):
-            line = lines[i].strip()
+        for i, line in enumerate(lines):
             if line == "count=":
-                i += 1
-                moves = int(lines[i].strip())
+                moves = int(lines[i + 1])
             elif line == "check_win=":
-                i += 1
-                game_over = (lines[i].strip() == "1")
+                game_over = (lines[i + 1] == "1")
             elif line == "grid=":
-                i += 1
-                new_grid = []
-                r = 0
-                while r < grid_size:
-                    row_vals = lines[i].strip().split()
-                    row = []
-                    c = 0
-                    while c < grid_size:
-                        row.append(int(row_vals[c]))
-                        c += 1
-                    new_grid.append(row)
-                    i += 1
-                    r += 1
-                grid = new_grid
-                continue
-            i += 1
+                grid = [[int(val) for val in lines[i + 1 + r].split()] for r in range(grid_size)]
         print("Game Loaded from save.txt!")
     except Exception as e:
         print("No save.txt file found or format error.")
@@ -118,39 +66,20 @@ def load_game():
 def draw():
     hover_col = mouseX // cell_size
     hover_row = mouseY // cell_size
+    hover_active = not game_over and (0 <= hover_row < grid_size) and (0 <= hover_col < grid_size)
 
-    hover_active = False
-    if not game_over:
-        if 0 <= hover_row < grid_size:
-            if 0 <= hover_col < grid_size:
-                hover_active = True
-
-    i = 0
-    while i < grid_size:
-        j = 0
-        while j < grid_size:
-            is_hover = False
-            if hover_active:
-                dist = abs(i - hover_row) + abs(j - hover_col)
-                if dist <= 1:
-                    is_hover = True
+    for i in range(grid_size):
+        for j in range(grid_size):
+            is_hover = hover_active and (abs(i - hover_row) + abs(j - hover_col) <= 1)
 
             if grid[i][j] == 1:
-                if is_hover:
-                    fill(170)
-                else:
-                    fill(255)
+                fill(170 if is_hover else 255)
             else:
-                if is_hover:
-                    fill(15)
-                else:
-                    fill(40)
+                fill(15 if is_hover else 40)
 
             stroke(80)
             strokeWeight(2)
             rect(j * cell_size, i * cell_size, cell_size, cell_size)
-            j += 1
-        i += 1
 
     fill(30)
     noStroke()
@@ -182,17 +111,17 @@ def mousePressed():
     y = mouseX // cell_size
     x = mouseY // cell_size
 
-    if 0 <= x < grid_size:
-        if 0 <= y < grid_size:
-            toggle(x, y)
-            moves += 1
-            if check_win():
-                game_over = True
+    if 0 <= x < grid_size and 0 <= y < grid_size:
+        toggle(x, y)
+        moves += 1
+        if check_win():
+            game_over = True
 
 def keyPressed():
-    if key == 's' or key == 'S':
+    k = str(key).lower()
+    if k == 's':
         save_game()
-    elif key == 'l' or key == 'L':
+    elif k == 'l':
         load_game()
-    elif key == 'r' or key == 'R':
+    elif k == 'r':
         reset_game()
